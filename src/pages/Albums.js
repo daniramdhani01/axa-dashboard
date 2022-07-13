@@ -2,15 +2,13 @@ import { API } from '../config/API';
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import $ from 'jquery';
-import { Container, Table, Card, Modal, Button, Form } from "react-bootstrap"
+import { Container, Table, Card } from "react-bootstrap"
 import { UserContext } from '../context/userContext.js';
 
 // components
 import NavBar from "../components/Navbar"
 
 // icons
-import minus from "../assets/icons/minus.svg"
-import pencil from "../assets/icons/pencil.svg"
 import eye from "../assets/icons/eye.svg"
 
 export default function Albums() {
