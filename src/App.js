@@ -1,24 +1,23 @@
-import logo from './logo.svg';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import "datatables.net-dt/css/jquery.dataTables.min.css"
+import "datatables.net-dt/js/dataTables.dataTables"
+import { Routes, Route } from "react-router-dom"
+
+// import pages
+import NotFound from './pages/NotFound';
+import Home from './pages/Home';
+import Posts from './pages/Posts';
+import PostsDetails from './pages/PostsDetails';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/posts" element={<Posts />} />
+      <Route path="/posts/:id" element={<PostsDetails />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 
