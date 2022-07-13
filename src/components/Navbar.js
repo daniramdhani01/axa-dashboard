@@ -13,8 +13,8 @@ export default function NavBar() {
                         <NavDropdown align="end" title="Admin" id="navbarScrollingDropdown">
                             <NavDropdown.Item href="#action3" className="d-flex align-items-center mb-3">
                                 <div className="ms-2 d-flex flex-column" style={{ lineHeight: "10px" }}>
-                                    <h5 className="nav-user-name">Patrick Jane</h5>
-                                    <span className="nav-user-desc">Administrator</span>
+                                    <h5 className="nav-user-name">Dani</h5>
+                                    <span className="nav-user-desc">Admin</span>
                                 </div>
                             </NavDropdown.Item>
                             <NavDropdown.Item>

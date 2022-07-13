@@ -18,6 +18,7 @@ export default function Posts() {
     const { user } = state.storedata
     const navigate = useNavigate()
     const [show, setShow] = useState(false)
+    const [showAdd, setShowAdd] = useState(false)
     const [posts, setposts] = useState([])
     const [selectpost, setselectpost] = useState([{
         title: "",
@@ -26,6 +27,8 @@ export default function Posts() {
     const [loading, setloading] = useState(true)
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const handleShowAdd = () => setShowAdd(true);
+    const handleCloseAdd = () => setShowAdd(false);
 
     const getPosts = () => {
         API.get(`posts?userId=${user.id}`)
@@ -100,6 +103,34 @@ export default function Posts() {
             })
     }
 
+    const handleAddNew = (e) => {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const formData = {
+            userId: user.id,
+            title: data.get("title"),
+            body: data.get("body")
+        }
+        setloading(true)
+        handleCloseAdd()
+        API.post(`posts`, formData)
+            .then(res => {
+                if (res.status != 201) {
+                    return alert("Error adding new post")
+                }
+                res.data.id = Math.floor(Math.random() * 100)
+                let array = posts
+                array.push(res.data)
+                setposts(array)
+                alert("data has been added.\nImportant: resource will not be really updated on the server but it will be faked as if.")
+            }).catch(err => {
+                console.log(err)
+            }).finally(() => {
+                setloading(false)
+            })
+    }
+
+
 
     $(document).ready(function () {
         $('#example').DataTable();
@@ -128,38 +159,43 @@ export default function Posts() {
                                 </div>
                             </div>
                             :
-                            <Table responsive hover id='example' className="display container">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Title</th>
-                                        <th>Body</th>
-                                        <th>PostId</th>
-                                        <th style={{ width: "10%" }}>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {posts.map((post, index) => {
-                                        return (
-                                            <tr key={index} >
-                                                <td>{index + 1}</td>
-                                                <td>{post.title}</td>
-                                                <td>{post.body}</td>
-                                                <td>{post.id}</td>
-                                                <td>
-                                                    <div className='d-flex justify-content-between'>
-                                                        <img src={eye} alt="#" className='icons-crud pointer' onClick={() => { handleClick(post.id) }} />
-                                                        <img src={pencil} alt="#" className='icons-crud pointer' onClick={() => handleSelect(post.id)} />
-                                                        <img src={minus} alt="#" className='icons-crud pointer' onClick={() => { handleDelete(post.id) }} />
-                                                    </div>
-                                                </td>
-                                            </tr>
+                            <div>
+                                <Button variant="primary" className='mb-3' onClick={() => handleShowAdd()}>
+                                    Add New Post
+                                </Button>
+                                <Table responsive hover id='example' className="display container">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Title</th>
+                                            <th>Body</th>
+                                            <th>PostId</th>
+                                            <th style={{ width: "10%" }}>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {posts.map((post, index) => {
+                                            return (
+                                                <tr key={index} >
+                                                    <td>{index + 1}</td>
+                                                    <td>{post.title}</td>
+                                                    <td>{post.body}</td>
+                                                    <td>{post.id}</td>
+                                                    <td>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <img src={eye} alt="#" className='icons-crud pointer' onClick={() => { handleClick(post.id) }} />
+                                                            <img src={pencil} alt="#" className='icons-crud pointer' onClick={() => handleSelect(post.id)} />
+                                                            <img src={minus} alt="#" className='icons-crud pointer' onClick={() => { handleDelete(post.id) }} />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }
                                         )
-                                    }
-                                    )
-                                    }
-                                </tbody>
-                            </Table>
+                                        }
+                                    </tbody>
+                                </Table>
+                            </div>
                         }
                     </Card.Body>
                 </Card>
@@ -192,6 +228,37 @@ export default function Posts() {
                             Close
                         </Button>
                         <Button type='submit' variant="primary">Save Changes</Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+
+            {/* add new modal */}
+            <Modal
+                show={showAdd}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Form onSubmit={handleAddNew}>
+                    <Modal.Header>
+                        <Modal.Title>Add New Post</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Title</Form.Label>
+                            <Form.Control type="text" name="title" />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Body</Form.Label>
+                            <Form.Control as="textarea" name="body" rows={3} />
+                        </Form.Group>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseAdd}>
+                            Close
+                        </Button>
+                        <Button type='submit' variant="primary">Submit</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>

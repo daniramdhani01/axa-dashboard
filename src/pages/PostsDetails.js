@@ -19,8 +19,11 @@ export default function PostsDetails() {
     const [comments, setcomments] = useState([])
     const [loading, setloading] = useState(true)
     const [show, setShow] = useState(false)
+    const [showAdd, setShowAdd] = useState(false)
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const handleShowAdd = () => setShowAdd(true);
+    const handleCloseAdd = () => setShowAdd(false);
 
     const [selectcomment, setselectcomment] = useState([{
         id: '',
@@ -94,6 +97,35 @@ export default function PostsDetails() {
             })
     }
 
+    const handleAddNew = (e) => {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const formData = {
+            postId: post.id,
+            name: data.get("name"),
+            email: data.get("email"),
+            body: data.get("body")
+        }
+        setloading(true)
+        handleCloseAdd()
+        API.post(`comments`, formData)
+            .then(res => {
+                console.log(res)
+                if (res.status != 201) {
+                    return alert("Error adding comment")
+                }
+                res.data.id = Math.floor(Math.random() * 100)
+                let array = comments
+                array.push(res.data)
+                setcomments(array)
+                alert("data has been added.\nImportant: resource will not be really updated on the server but it will be faked as if.")
+            }).catch(err => {
+                console.log(err)
+            }).finally(() => {
+                setloading(false)
+            })
+    }
+
     useEffect(() => {
         getComments()
         return () => {
@@ -107,7 +139,7 @@ export default function PostsDetails() {
                 <Card className="shadow-sm">
                     <Card.Body>
                         <Card.Title>
-                            <h5 className="mb-3">{user.name} Post Details</h5>
+                            <h5 className="mb-3">{user.name} Post Details and Comments</h5>
                             <h6 className="mb-3"></h6>
                         </Card.Title>
                         {loading ?
@@ -134,6 +166,9 @@ export default function PostsDetails() {
                                 <h5>
                                     Comments
                                 </h5>
+                                <Button variant="primary" className='mb-3' onClick={() => handleShowAdd()}>
+                                    Add New Comment
+                                </Button>
                                 <Table responsive hover id='example' className="display container">
                                     <thead>
                                         <tr>
@@ -206,6 +241,41 @@ export default function PostsDetails() {
                             Close
                         </Button>
                         <Button type='submit' variant="primary">Save Changes</Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+
+            {/* add new modal */}
+            <Modal
+                show={showAdd}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Form onSubmit={handleAddNew}>
+                    <Modal.Header>
+                        <Modal.Title>Add New Comment</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control type="text" name="name" />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control type="email" name="email" />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Body</Form.Label>
+                            <Form.Control as="textarea" name="body" rows={3} />
+                        </Form.Group>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleCloseAdd}>
+                            Close
+                        </Button>
+                        <Button type='submit' variant="primary">Submit</Button>
                     </Modal.Footer>
                 </Form>
             </Modal>

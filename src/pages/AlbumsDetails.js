@@ -101,7 +101,7 @@ export default function AlbumsDetails() {
                     </Modal.Header>
                     <Modal.Body>
                         <div className="">
-                            <img src={selectphoto[0].url} alt="" style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }} />
+                            <img src={selectphoto[0].url} alt="" style={{ width: "100%", maxHeight: "450px", objectFit: "cover" }} className="mb-3" />
                             <span>{selectphoto[0].title}</span>
                         </div>
                     </Modal.Body>
