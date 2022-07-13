@@ -12,7 +12,7 @@ const reducer = (state, action) => {
 
     switch (type) {
         case 'SET_USER':
-
+        case 'SET_POST':
             return {
                 isLogin: true,
                 storedata: payload,

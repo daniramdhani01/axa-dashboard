@@ -30,7 +30,9 @@ export default function Home() {
     const handleClick = (id) => {
         dispatch({
             type: "SET_USER",
-            payload: users.find(user => user.id === id)
+            payload: {
+                user: users.find(user => user.id === id)
+            }
         })
         navigate("posts")
     }
@@ -68,7 +70,7 @@ export default function Home() {
                                         <th>Name</th>
                                         <th>Email</th>
                                         <th>Website</th>
-                                        <th>Others</th>
+                                        <th>See Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -80,11 +82,14 @@ export default function Home() {
                                                 <td>{user.email}</td>
                                                 <td>{user.website}</td>
                                                 <td>
-                                                    <span onClick={() => handleClick(user.id)} className="pointer">
+                                                    <span onClick={() => handleClick(user.id)} className="pointer link-primary">
                                                         Posts
-                                                    </span>
+                                                    </span >
                                                     ,
-                                                    Albums</td>
+                                                    <span className="pointer link-primary">
+                                                        Albums
+                                                    </span>
+                                                </td>
                                             </tr>
                                         )
                                     }

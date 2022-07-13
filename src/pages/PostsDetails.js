@@ -1,23 +1,28 @@
-import { useParams } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { API } from "../config/API.js"
 import { useState, useEffect, useContext } from "react"
-import { Card, Container } from "react-bootstrap"
+import { Card, Container, Table } from "react-bootstrap"
 import { UserContext } from '../context/userContext.js';
 
 // components
 import NavBar from "../components/Navbar"
 
-export default function PostsDetails() {
-    const { id } = useParams()
-    const [post, setpost] = useState({})
-    const [loading, setloading] = useState(true)
-    const [state, dispatch] = useContext(UserContext)
-    const user = state.storedata
+// icons
+import minus from "../assets/icons/minus.svg"
+import pencil from "../assets/icons/pencil.svg"
+import eye from "../assets/icons/eye.svg"
 
-    const getData = () => {
-        API.get(`posts/${id}`)
+export default function PostsDetails() {
+    const navigate = useNavigate()
+    const [state, dispatch] = useContext(UserContext)
+    const { user, post } = state.storedata
+    const [comments, setcomments] = useState([])
+    const [loading, setloading] = useState(true)
+
+    const getComments = () => {
+        API.get(`comments?postId=${post.id}`)
             .then(res => {
-                setpost(res.data)
+                setcomments(res.data)
             }).catch(err => {
                 console.log(err)
             }).finally(() => {
@@ -25,10 +30,29 @@ export default function PostsDetails() {
             })
     }
 
+    const handleDelete = (id) => {
+        setloading(true)
+        API.delete(`comments/${id}`)
+            .then(res => {
+                if (res.status != 200) {
+                    return alert("Error deleting comment")
+                }
+                const array = comments.filter(comment => comment.id !== id)
+                setcomments(array)
+                alert("data has been deleted.\nImportant: resource will not be really updated on the server but it will be faked as if.")
+            })
+            .catch(err => {
+                console.log(err)
+            })
+            .finally(() => {
+                setloading(false)
+            })
+    }
+
     useEffect(() => {
-        getData()
+        getComments()
         return () => {
-            setpost({})
+            setcomments([])
         }
     }, [])
     return (
@@ -62,12 +86,46 @@ export default function PostsDetails() {
                                         </div>
                                     </div>
                                 </div>
+                                <h5>
+                                    Comments
+                                </h5>
+                                <Table responsive hover id='example' className="display container">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Name</th>
+                                            <th>Comment Body</th>
+                                            <th>Email</th>
+                                            <th>Id</th>
+                                            <th style={{ width: "10%" }}>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {comments.map((comment, index) => {
+                                            return (
+                                                <tr key={index}>
+                                                    <td>{index + 1}</td>
+                                                    <td>{comment.name}</td>
+                                                    <td>{comment.body}</td>
+                                                    <td>{comment.email}</td>
+                                                    <td>{comment.id}</td>
+                                                    <td>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <img src={pencil} alt="#" className='icons-crud pointer' />
+                                                            <img src={minus} alt="#" className='icons-crud pointer' onClick={() => handleDelete(comment.id)} />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )
+                                        }
+                                        )}
+                                    </tbody>
+                                </Table>
                             </div>
-
                         }
                     </Card.Body>
                 </Card>
             </Container>
-        </div>
+        </div >
     )
 }
