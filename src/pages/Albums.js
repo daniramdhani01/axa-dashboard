@@ -13,13 +13,13 @@ import minus from "../assets/icons/minus.svg"
 import pencil from "../assets/icons/pencil.svg"
 import eye from "../assets/icons/eye.svg"
 
-export default function Posts() {
+export default function Albums() {
     const [state, dispatch] = useContext(UserContext)
     const { user } = state.storedata
     const navigate = useNavigate()
     const [show, setShow] = useState(false)
-    const [posts, setposts] = useState([])
-    const [selectpost, setselectpost] = useState([{
+    const [albums, setalbums] = useState([])
+    const [selectalbum, setselectalbum] = useState([{
         title: "",
         body: ""
     }])
@@ -27,10 +27,10 @@ export default function Posts() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const getPosts = () => {
-        API.get(`posts?userId=${user.id}`)
+    const getAlbums = () => {
+        API.get(`albums?userId=${user.id}`)
             .then(res => {
-                setposts(res.data)
+                setalbums(res.data)
             }).catch(err => {
                 console.log(err)
             }).finally(() => {
@@ -40,13 +40,13 @@ export default function Posts() {
 
     const handleDelete = (id) => {
         setloading(true)
-        API.delete(`posts/${id}`)
+        API.delete(`albums/${id}`)
             .then(res => {
                 if (res.status != 200) {
-                    return alert("Error deleting post")
+                    return alert("Error deleting album")
                 }
-                const array = posts.filter(post => post.id !== id)
-                setposts(array)
+                const array = albums.filter(album => album.id !== id)
+                setalbums(array)
                 alert("data has been deleted.\nImportant: resource will not be really updated on the server but it will be faked as if.")
             })
             .catch(err => {
@@ -58,20 +58,20 @@ export default function Posts() {
     }
 
     const handleClick = (id) => {
-        const array = posts.filter(post => post.id === id)
+        const array = albums.filter(album => album.id === id)
         dispatch({
-            type: "SET_POST",
+            type: "SET_ALBUM",
             payload: {
                 user,
-                post: array[0]
+                album: array[0]
             }
         })
-        navigate(`/posts/details`)
+        navigate(`/albums/details`)
     }
 
     const handleSelect = (id) => {
-        const select = posts.filter(post => post.id === id)
-        setselectpost(select)
+        const select = albums.filter(album => album.id === id)
+        setselectalbum(select)
         handleShow()
     }
 
@@ -79,19 +79,18 @@ export default function Posts() {
         e.preventDefault()
         const data = new FormData(e.target)
         const formData = {
-            title: data.get("title"),
-            body: data.get("body")
+            title: data.get("title")
         }
         setloading(true)
         handleClose()
-        API.put(`posts/${selectpost[0].id}`, formData)
+        API.put(`albums/${selectalbum[0].id}`, formData)
             .then(res => {
                 if (res.status != 200) {
-                    return alert("Error updating post")
+                    return alert("Error updating album")
                 }
-                const array = posts.filter(post => post.id !== selectpost[0].id)
+                const array = albums.filter(album => album.id !== selectalbum[0].id)
                 array.push(res.data)
-                setposts(array)
+                setalbums(array)
                 alert("data has been updated.\nImportant: resource will not be really updated on the server but it will be faked as if.")
             }).catch(err => {
                 console.log(err)
@@ -107,9 +106,9 @@ export default function Posts() {
 
 
     useEffect(() => {
-        getPosts()
+        getAlbums()
         return () => {
-            setposts([])
+            setalbums([])
         }
     }, [])
 
@@ -120,7 +119,7 @@ export default function Posts() {
                 <Card className="shadow-sm">
                     <Card.Body>
                         <Card.Title>
-                            <h5 className="mb-3">{user.name} Post List</h5>
+                            <h5 className="mb-3">{user.name} Album List</h5>
                         </Card.Title>
                         {loading ?
                             <div className="text-center my-5">
@@ -133,24 +132,22 @@ export default function Posts() {
                                     <tr>
                                         <th>#</th>
                                         <th>Title</th>
-                                        <th>Body</th>
-                                        <th>PostId</th>
+                                        <th>album Id</th>
                                         <th style={{ width: "10%" }}>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {posts.map((post, index) => {
+                                    {albums.map((album, index) => {
                                         return (
                                             <tr key={index} >
                                                 <td>{index + 1}</td>
-                                                <td>{post.title}</td>
-                                                <td>{post.body}</td>
-                                                <td>{post.id}</td>
+                                                <td>{album.title}</td>
+                                                <td>{album.id}</td>
                                                 <td>
                                                     <div className='d-flex justify-content-between'>
-                                                        <img src={eye} alt="#" className='icons-crud pointer' onClick={() => { handleClick(post.id) }} />
-                                                        <img src={pencil} alt="#" className='icons-crud pointer' onClick={() => handleSelect(post.id)} />
-                                                        <img src={minus} alt="#" className='icons-crud pointer' onClick={() => { handleDelete(post.id) }} />
+                                                        <img src={eye} alt="#" className='icons-crud pointer' onClick={() => { handleClick(album.id) }} />
+                                                        <img src={pencil} alt="#" className='icons-crud pointer' onClick={() => handleSelect(album.id)} />
+                                                        <img src={minus} alt="#" className='icons-crud pointer' onClick={() => { handleDelete(album.id) }} />
                                                     </div>
                                                 </td>
                                             </tr>
@@ -174,18 +171,13 @@ export default function Posts() {
             >
                 <Form onSubmit={handleSubmit}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{user.name} Post</Modal.Title>
+                        <Modal.Title>{user.name} Album</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Group className="mb-3">
                             <Form.Label>Title</Form.Label>
-                            <Form.Control type="text" name="title" defaultValue={selectpost[0].title} />
+                            <Form.Control type="text" name="title" defaultValue={selectalbum[0].title} />
                         </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Body</Form.Label>
-                            <Form.Control as="textarea" name="body" rows={3} defaultValue={selectpost[0].body} />
-                        </Form.Group>
-
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>

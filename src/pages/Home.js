@@ -27,14 +27,23 @@ export default function Home() {
             })
     }
 
-    const handleClick = (id) => {
+    const handleSelect = (id) => {
         dispatch({
             type: "SET_USER",
             payload: {
                 user: users.find(user => user.id === id)
             }
         })
+    }
+
+    const handleClickPost = (id) => {
+        handleSelect(id)
         navigate("posts")
+    }
+
+    const handleClickAlbum = (id) => {
+        handleSelect(id)
+        navigate("albums")
     }
 
     $(document).ready(function () {
@@ -82,11 +91,11 @@ export default function Home() {
                                                 <td>{user.email}</td>
                                                 <td>{user.website}</td>
                                                 <td>
-                                                    <span onClick={() => handleClick(user.id)} className="pointer link-primary">
+                                                    <span onClick={() => handleClickPost(user.id)} className="pointer link-primary">
                                                         Posts
                                                     </span >
                                                     ,
-                                                    <span className="pointer link-primary">
+                                                    <span className="pointer link-primary" onClick={() => handleClickAlbum(user.id)}>
                                                         Albums
                                                     </span>
                                                 </td>

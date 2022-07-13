@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { API } from "../config/API.js"
 import { useState, useEffect, useContext } from "react"
-import { Card, Container, Table } from "react-bootstrap"
+import { Card, Container, Table, Modal, Form, Button } from "react-bootstrap"
 import { UserContext } from '../context/userContext.js';
 
 // components
@@ -18,6 +18,16 @@ export default function PostsDetails() {
     const { user, post } = state.storedata
     const [comments, setcomments] = useState([])
     const [loading, setloading] = useState(true)
+    const [show, setShow] = useState(false)
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const [selectcomment, setselectcomment] = useState([{
+        id: '',
+        name: "",
+        email: "",
+        body: ""
+    }])
 
     const getComments = () => {
         API.get(`comments?postId=${post.id}`)
@@ -45,6 +55,41 @@ export default function PostsDetails() {
                 console.log(err)
             })
             .finally(() => {
+                setloading(false)
+            })
+    }
+
+    const handleSelect = (id) => {
+        const array = comments.filter(comment => comment.id === id)
+        setselectcomment(array)
+        handleShow()
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const data = new FormData(e.target)
+        const formData = {
+            id: data.get("id"),
+            name: data.get("name"),
+            email: data.get("email"),
+            body: data.get("body")
+        }
+        setloading(true)
+        handleClose()
+        API.put(`comments/${selectcomment[0].id}`, formData)
+            .then(res => {
+                if (res.status != 200) {
+                    return alert("Error updating comment")
+                }
+                // const array = posts.filter(post => post.id !== selectpost[0].id)
+                const array = comments.filter(comment => comment.id !== selectcomment[0].id)
+                array.push(res.data)
+                setcomments(array)
+                alert("data has been updated.\nImportant: resource will not be really updated on the server but it will be faked as if.")
+            })
+            .catch(err => {
+                console.log(err)
+            }).finally(() => {
                 setloading(false)
             })
     }
@@ -111,7 +156,7 @@ export default function PostsDetails() {
                                                     <td>{comment.id}</td>
                                                     <td>
                                                         <div className='d-flex justify-content-between'>
-                                                            <img src={pencil} alt="#" className='icons-crud pointer' />
+                                                            <img src={pencil} alt="#" className='icons-crud pointer' onClick={() => handleSelect(comment.id)} />
                                                             <img src={minus} alt="#" className='icons-crud pointer' onClick={() => handleDelete(comment.id)} />
                                                         </div>
                                                     </td>
@@ -126,6 +171,44 @@ export default function PostsDetails() {
                     </Card.Body>
                 </Card>
             </Container>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Form onSubmit={handleSubmit}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Patricia Lebsack Post</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Form.Group className="mb-3">
+                            <Form.Label>ID Comment</Form.Label>
+                            <Form.Control type="text" name="id" defaultValue={selectcomment[0].id} readOnly />
+                            {/* <div>{selectcomment[0].id}</div> */}
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Name</Form.Label>
+                            <Form.Control type="text" name="name" defaultValue={selectcomment[0].name} readOnly />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control type="text" name="email" defaultValue={selectcomment[0].email} readOnly />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Comment Body</Form.Label>
+                            <Form.Control as="textarea" name="body" rows={3} defaultValue={selectcomment[0].body} />
+                        </Form.Group>
+
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={handleClose}>
+                            Close
+                        </Button>
+                        <Button type='submit' variant="primary">Save Changes</Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
         </div >
     )
 }

@@ -6,7 +6,7 @@ export default function NavBar() {
     return (
         <Navbar bg="light" expand="lg" className="shadow bg-white mb-3">
             <Container>
-                <Navbar.Brand onClick={() => navigate("/")}>AXA Dashboard</Navbar.Brand >
+                <Navbar.Brand onClick={() => navigate("/")}><span className='pointer'>AXA Dashboard</span></Navbar.Brand >
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="w-100 d-flex justify-content-end align-items-center">
