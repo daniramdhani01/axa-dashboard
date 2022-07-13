@@ -63,7 +63,8 @@ export default function AlbumsDetails() {
                 <Card>
                     <Card.Body>
                         <Card.Title>
-                            <h3>{user.name} Albums</h3>
+                            <h3>{user.name} Albums and Photos</h3>
+                            <h5 className="mb-3">Album Title : {album.title}</h5>
                         </Card.Title>
                         {loading ?
                             <div className="text-center my-5">
